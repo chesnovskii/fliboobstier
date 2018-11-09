@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	// "fliboobstier/tg_bot"
+	"github.com/chesnovsky/fliboobstier/boobs"
 
 	"gopkg.in/telegram-bot-api.v4"
 )
@@ -13,14 +13,10 @@ func main() {
 
 	tgToken := os.Getenv("TG_TOKEN")
 
-	// tg_bot.Init()
 	bot, err := tgbotapi.NewBotAPI(tgToken)
-
 	if err != nil {
 		log.Panic(err)
 	}
-
-	bot.Debug = false
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
@@ -32,22 +28,9 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	}
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-		if update.Message.Text == "" {
-			log.Print("It's a penis!")
-		}
-		switch update.Message.Text {
-		case "сиськи":
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Привет, я покажу тебе сиськи, обязательно покажу, но потом, не сейчас, а сейчас хочу в пляс!!!")
-			bot.Send(msg)
-		default:
-			// log.Printf("[%s] %s", update.Message.From.UserName, update.Message.Text)
-			msg := tgbotapi.NewDocumentShare(update.Message.Chat.ID, "CAADAgADnQUAAlOx9wMjvcls38LyPwI")
-			bot.Send(msg)
 
-		}
+	for update := range updates {
+		boobs.Showmeyourboobs(bot, update.Message)
 	}
+
 }
