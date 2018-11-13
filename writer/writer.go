@@ -38,8 +38,9 @@ func LogPhotoId(photoID *[]tgbotapi.PhotoSize) {
 			}
 		}
 	}
-	logger.Logger.Debugf("Best photo ID is <%s>", (*photoID)[bestIndex].FileID)
-
-	// fmt.Printf("Photo class is:\n%v", photoType)
-
+	if bestIndex != -1 {
+		logger.Logger.Debugf("Best photo ID is <%s>", (*photoID)[bestIndex].FileID)
+	} else {
+		logger.Logger.Debug("No bestIndex found. Empty photo list?")
+	}
 }
