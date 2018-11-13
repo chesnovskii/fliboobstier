@@ -40,6 +40,7 @@ func LogPhotoId(photoID *[]tgbotapi.PhotoSize) {
 	}
 	if bestIndex != -1 {
 		logger.Logger.Debugf("Best photo ID is <%s>", (*photoID)[bestIndex].FileID)
+		logger.Logger.Debugf("Last photo ID is <%s>", (*photoID)[len(*photoID) - 1].FileID)
 	} else {
 		logger.Logger.Debug("No bestIndex found. Empty photo list?")
 	}
