@@ -14,7 +14,8 @@ func Showmeyourboobs(bot *tgbotapi.BotAPI, message *tgbotapi.Message) {
 	// }
 	logger.Logger.Debugf("Recieved message from [%s] %s [ChatId: %s] %s", message.From.UserName, message.Text, message.Chat.ID, message.Photo)
 
-	writer.WritePhoto(message.Photo)
+	// writer.WritePhoto(message.Photo)
+	writer.LogPhotoId(message.Photo)
 
 	switch message.Text {
 	case "сиськи":

@@ -14,7 +14,7 @@ func main() {
 
 	bot, err := tgbotapi.NewBotAPI(tgToken)
 	if err != nil {
-		logger.Logger.Fatal(err)
+		logger.Logger.Fatalf("Cannot init Telegram BotApi:\n%v", err)
 	}
 
 	logger.Logger.Infof("Authorized on account %s", bot.Self.UserName)

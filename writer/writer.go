@@ -19,3 +19,27 @@ func WritePhoto(photoID *[]tgbotapi.PhotoSize) {
 	fmt.Fprintln(file, photoID)
 
 }
+
+
+func LogPhotoId(photoID *[]tgbotapi.PhotoSize) {
+	bestIndex := -1
+	logger.Logger.Debugf("Finding the best photo from struct:\n%v", *photoID)
+	for k,v := range *photoID {
+		logger.Logger.Debugf("Photo index is <%d>", k)
+		logger.Logger.Debugf("Photo size is <%d>", v.FileSize)
+		logger.Logger.Debugf("Photo ID is <%s>", v.FileID)
+		if bestIndex == -1 {
+			logger.Logger.Debug("No bestIndex found, assigning")
+			bestIndex = k
+		} else {
+			if v.FileSize > (*photoID)[bestIndex].FileSize {
+				logger.Logger.Debugf("This photo is bigger than <%d> , assigning", (*photoID)[bestIndex].FileSize)
+				bestIndex = k
+			}
+		}
+	}
+	logger.Logger.Debugf("Best photo ID is <%s>", (*photoID)[bestIndex].FileID)
+
+	// fmt.Printf("Photo class is:\n%v", photoType)
+
+}
