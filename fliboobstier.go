@@ -1,31 +1,36 @@
 package main
 
 import (
-	"os"
-
-	"github.com/chesnovsky/fliboobstier/boobs"
+	"github.com/chesnovsky/fliboobstier/bot"
+	"github.com/chesnovsky/fliboobstier/config"
 	"github.com/chesnovsky/fliboobstier/logger"
-	"gopkg.in/telegram-bot-api.v4"
 )
 
 func main() {
 
-	tgToken := os.Getenv("TG_TOKEN")
-
-	bot, err := tgbotapi.NewBotAPI(tgToken)
+	logger.Init("")
+	err, mainConfig := config.GetConfig()
 	if err != nil {
-		logger.Logger.Fatalf("Cannot init Telegram BotApi:\n%v", err)
+		logger.Logger.Fatalf("Config load failed:\n%v\n", err)
 	}
+	bot.RunBot(mainConfig)
 
-	logger.Logger.Infof("Authorized on account %s", bot.Self.UserName)
+	// tgToken := os.Getenv("TG_TOKEN")
 
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
+	// bot, err := tgbotapi.NewBotAPI(tgToken)
+	// if err != nil {
+	// 	logger.Logger.Fatalf("Cannot init Telegram BotApi:\n%v", err)
+	// }
 
-	updates, err := bot.GetUpdatesChan(u)
+	// logger.Logger.Infof("Authorized on account %s", bot.Self.UserName)
 
-	for update := range updates {
-		boobs.Showmeyourboobs(bot, update.Message)
-	}
+	// u := tgbotapi.NewUpdate(0)
+	// u.Timeout = 60
+
+	// updates, err := bot.GetUpdatesChan(u)
+
+	// for update := range updates {
+	// 	boobs.Showmeyourboobs(bot, update.Message)
+	// }
 
 }

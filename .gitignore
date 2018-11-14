@@ -4,6 +4,8 @@
 !README.md
 !Dockerfile
 !fliboobstier.go
-!boobs/*
+!config.yml
+!bot/*
+!config/*
 !logger/*
 !writer/*
