@@ -11,7 +11,7 @@ import (
 
 type MainConfig struct {
     TgToken string               `env:"FLIBOOBSTIER_TG_TOKEN,required"`
-    Catch   map[string]WordCatch `yaml:"wordCathes"`
+    Catches map[string]WordCatch `yaml:"wordCathes"`
 }
 
 type WordCatch struct {
