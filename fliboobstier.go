@@ -8,7 +8,7 @@ import (
 
 func main() {
 	logger.Init("")
-	err, mainConfig := config.GetConfig()
+	mainConfig, err := config.GetConfig()
 	if err != nil {
 		logger.Logger.Fatalf("Config load failed:\n%v\n", err)
 	}

@@ -6,6 +6,6 @@ wordCathes:
     stickers:
       - "CAADAgADnQUAAlOx9wMjvcls38LyPwI"
   gopstop:
-    regex: ".*(gop).*"
+    regex: ".*(gop|гоп).*"
     stickers:
       - "CAADAgADXwMAAgw7AAEKTh8jAAH9Q-gAAQI"

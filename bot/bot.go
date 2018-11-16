@@ -18,6 +18,7 @@ var (
 //     return err
 // }
 
+// RunBot is an init func for TG Bot
 func RunBot(mainConfig config.MainConfig) {
     logger.Logger.Debug("Starting a bot")
     logger.Logger.Debugf("Got config:\n%v", mainConfig)
@@ -26,28 +27,46 @@ func RunBot(mainConfig config.MainConfig) {
     if err != nil {
         logger.Logger.Fatalf("Cannot start a TG API:\n%v", err)
     }
-    logger.Logger.Infof("Started on account @%s", TgBot.Self.UserName)
+    logger.Logger.Infof("Started on account http://t.me/%s", TgBot.Self.UserName)
 
     u := tgbotapi.NewUpdate(0)
     u.Timeout = 60
     updates, err := TgBot.GetUpdatesChan(u)
     for update := range updates {
-        for catchType, catchConfig := range mainConfig.Catches {
-            logger.Logger.Debugf("Starting <%s> sender", catchType)
-            sender(TgBot, update.Message, catchConfig)
+        logger.Logger.Debugf("Got raw update:\n%v\n", update.Message)
+        if update.Message != nil {
+            logger.Logger.Debugf("Got message images:\n%v\n", update.Message.Photo)
+            logger.Logger.Debugf("Got message stickers:\n%v\n", update.Message.Sticker)
+            logger.Logger.Debugf("Got message gif:\n%v\n", update.Message.Animation)
+            logger.Logger.Debugf("Got message documents:\n%v\n", update.Message.Document)
+            for catchType, catchConfig := range mainConfig.Catches {
+                logger.Logger.Debugf("Starting <%s> sender", catchType)
+                sender(TgBot, update.Message, catchConfig)
+            }
         }
     }
 }
 
 func sender(bot *tgbotapi.BotAPI, message *tgbotapi.Message, senderConfig config.WordCatch) {
-    logger.Logger.Debugf("Got message:\n%v\n", message.Sticker)
     logger.Logger.Debugf("Got local config:\n%v\n", senderConfig)
-    localRegex := regexp.MustCompile(senderConfig.Regex)
+    logger.Logger.Debugf("Got message text:\n%v\n", message.Text)
+    localRegex := regexp.MustCompile(senderConfig.RawRegex)
     matched := localRegex.MatchString(message.Text)
     logger.Logger.Debugf("Regex is mached:\t%v\t", matched)
     if matched {
-        msg := tgbotapi.NewStickerShare(message.Chat.ID, senderConfig.Stickers[0])
-        logger.Logger.Debugf("Sending NORMA message:\n%v\n", msg)
-        bot.Send(msg)
+        msg, err := createSenderMsg(senderConfig, message.Chat.ID)
+        if err == nil {
+            logger.Logger.Debugf("Sending message:\n%v\n", msg)
+            bot.Send(msg)
+        } else {
+            logger.Logger.Errorf("Cannot send an reply to message:\n%v\n%v", message, err)
+        }
     }
+}
+
+func createSenderMsg(senderConfig config.WordCatch, chatID int64) (tgbotapi.Chattable, error) {
+    // select media type
+    var err error
+    msg := tgbotapi.NewStickerShare(chatID, senderConfig.Stickers[0])
+    return msg, err
 }
