@@ -1,8 +1,6 @@
 package bot
 
 import (
-    "regexp"
-
     "github.com/chesnovsky/fliboobstier/config"
     "github.com/chesnovsky/fliboobstier/logger"
     "gopkg.in/telegram-bot-api.v4"
@@ -50,8 +48,7 @@ func RunBot(mainConfig config.MainConfig) {
 func sender(bot *tgbotapi.BotAPI, message *tgbotapi.Message, senderConfig config.WordCatch) {
     logger.Logger.Debugf("Got local config:\n%v\n", senderConfig)
     logger.Logger.Debugf("Got message text:\n%v\n", message.Text)
-    localRegex := regexp.MustCompile(senderConfig.RawRegex)
-    matched := localRegex.MatchString(message.Text)
+    matched := senderConfig.Regex.MatchString(message.Text)
     logger.Logger.Debugf("Regex is mached:\t%v\t", matched)
     if matched {
         msg, err := createSenderMsg(senderConfig, message.Chat.ID)

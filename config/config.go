@@ -19,14 +19,14 @@ type MainConfig struct {
 // WordCatch is a struct for each word compare type, with its own media
 type WordCatch struct {
     RawRegex string        `yaml:"regex"`
-    Regex    regexp.Regexp `yaml:"fuck,omitempty"`
+    Regex    *regexp.Regexp `yaml:"fuck,omitempty"`
     Images   []string      `yaml:"images"`
     Stickers []string      `yaml:"stickers"`
     Gifs     []string      `yaml:"gifs"`
 }
 
 // GetConfig is a init func, returning root config
-func GetConfig() (MainConfig, error) {
+func GetConfig(configPath string) (MainConfig, error) {
     config := MainConfig{}
 
     err := env.Parse(&config)
@@ -35,9 +35,9 @@ func GetConfig() (MainConfig, error) {
         return config, localErr
     }
 
-    yamlFile, err := ioutil.ReadFile("config.yml")
+    yamlFile, err := ioutil.ReadFile(configPath)
     if err != nil {
-        localErr := fmt.Errorf("Cannot read config.yml:\n%v ", err)
+        localErr := fmt.Errorf("Cannot read <%s>:\n%v ", configPath, err)
         return config, localErr
     }
     logger.Logger.Debugf("Got YAML config:\n%s\n", yamlFile)
@@ -49,7 +49,19 @@ func GetConfig() (MainConfig, error) {
     }
 
     // Compile all the regexes here
-
+    for wordKey, wordData := range config.Catches {
+        logger.Logger.Debugf("Got word <%s> with data:\t%v", wordKey, wordData)
+        logger.Logger.Debug("Compiling regexp")
+        compiled, err := regexp.Compile(wordData.RawRegex)
+        if err != nil {
+            localErr := fmt.Errorf("Cannot compile regex <%s>:\t%v", wordData.RawRegex, err)
+            return config, localErr
+        }
+        updatedWord := wordData
+        updatedWord.Regex = compiled
+        config.Catches[wordKey] = updatedWord
+        logger.Logger.Debugf("Compiled succesfull:\t%v", config.Catches[wordKey].Regex)
+    }
     logger.Logger.Debugf("Got parsed config config:\n%s\n", yamlFile)
     return config, nil
 }

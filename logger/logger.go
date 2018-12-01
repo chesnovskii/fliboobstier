@@ -26,7 +26,6 @@ func (hook ContextHook) Fire(entry *logrus.Entry) error {
 		funcName := runtime.FuncForPC(pc).Name()
 		entry.Data["source"] = fmt.Sprintf("%s:%v:%s", path.Base(file), line, path.Base(funcName))
 	}
-
 	return nil
 }
 
