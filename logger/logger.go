@@ -43,6 +43,14 @@ func init() {
 
 // Init for a logger
 func Init(logFile string) {
-	Logger.Out = os.Stdout
-	fmt.Println("Init stdout logger")
+	if logFile == "" {
+		Logger.Out = os.Stdout
+	} else {
+		file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY, 0660)
+		if err == nil {
+			Logger.Out = file
+		} else {
+			Logger.Fatalf("Cannot init logger to file <%s>:\t%v", logFile, err)
+		}
+	}
 }

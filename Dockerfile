@@ -1,8 +1,8 @@
 FROM golang:alpine as build
 COPY . /go/src/github.com/chesnovsky/fliboobstier
 WORKDIR /go/src/github.com/chesnovsky/fliboobstier
-RUN apk add --no-cache git make gcc libc-dev ca-certificates
-RUN  make deps \
+RUN  apk add --no-cache git make gcc libc-dev ca-certificates \
+  && make deps \
   && make
 
 FROM library/alpine
