@@ -1,3 +1,4 @@
+// Main package of Fliboobstier TG bot
 package main
 
 import (
@@ -8,7 +9,8 @@ import (
 
 func main() {
 	logger.Init("")
-	mainConfig, err := config.GetConfig()
+	configPath := "config.yml"
+	mainConfig, err := config.GetConfig(configPath)
 	if err != nil {
 		logger.Logger.Fatalf("Config load failed:\n%v\n", err)
 	}

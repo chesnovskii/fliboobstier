@@ -1,40 +1,27 @@
 # Fliboobstier
 
-### Environment
+### Envs
 
-**`TG_TOKEN`** - Telegram bot token
+**FLIBOOBSTIER_TG_TOKEN** - set Telegram bot token   
+`export FLIBOOBSTIER_TG_TOKEN="some_very_secret_token"`
 
-For example:
+**HTTP_PROXY** - use proxy (optional)   
+`export HTTP_PROXY="socks5://login:passwd@example.com:1080"`
 
-    $ export TG_TOKEN="some_very_secret_token"
-    $ echo $TG_TOKEN
-    some_very_secret_token
-
-**`HTTP_PROXY`** - Use proxy (if needed)
-
-For example:
-
-    $ export HTTP_PROXY="socks5://login:passwd@example.com:1080"
-    $ echo $HTTP_PROXY
-    socks5://login:passwd@example.com:1080
-
-#### Building for source
+#### Manual build and run
 
 ```
-$ go get github.com/go-telegram-bot-api/telegram-bot-api
-$ go build -o fliboobstier .
-$ go run fliboobstier
+make deps && make && make install
+$GOPATH/bin/fliboobstier
 ```
 
-### Docker
+### Docker build and run
 ```
-$ docker build -t fliboobstier .
-```
+docker build -t fliboobstier .
 
-```
 docker run -d \
 -e HTTP_PROXY=$HTTP_PROXY \
--e TG_TOKEN=$SEAL_TG_TOKEN \
+-e FLIBOOBSTIER_TG_TOKEN=$FLIBOOBSTIER_TG_TOKEN \
 fliboobstier
 ```
 

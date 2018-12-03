@@ -1,11 +1,4 @@
-*
-!*/
-!.gitignore
-!README.md
-!Dockerfile
-!fliboobstier.go
-!config.yml
-!bot/*
-!config/*
-!logger/*
-!writer/*
+bin
+bin*
+.test.*
+.git

@@ -1,9 +1,12 @@
-# Fliboobstier bot container
-FROM golang:alpine
-WORKDIR /go/src/fliboobstier
-COPY fliboobstier.go .
-RUN apk add --no-cache git \
-    && go get github.com/go-telegram-bot-api/telegram-bot-api \
-    && go get -d -v ./... \
-    && go install -v ./...
-ENTRYPOINT ["/go/bin/fliboobstier"]
+FROM golang:alpine as build
+COPY . /go/src/github.com/chesnovsky/fliboobstier
+WORKDIR /go/src/github.com/chesnovsky/fliboobstier
+RUN  apk add --no-cache git make gcc libc-dev ca-certificates \
+  && make deps \
+  && make
+
+FROM library/alpine
+RUN apk add --no-cache ca-certificates
+COPY config.yml /config.yml
+COPY --from=build /go/src/github.com/chesnovsky/fliboobstier/bin /fliboobstier
+CMD ["/fliboobstier"]
