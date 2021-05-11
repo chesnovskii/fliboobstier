@@ -6,7 +6,7 @@ import (
 	"path"
 	"runtime"
 
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // Logger is a logger object for global access

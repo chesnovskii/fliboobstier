@@ -1,65 +1,54 @@
 package config
 
 import (
-    "testing"
-    "fmt"
-    "io/ioutil"
+	"fmt"
+	"io/ioutil"
+	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func createTestConfig(configPath string) error {
-    testFileString := `
+	testFileString := `
 ---
 
-wordCathes:
+regex_actions:
   normal:
     regex: ".*(норма|norma).*"
-    stickers:
-      - "CAADAgADnQUAAlOx9wMjvcls38LyPwI"
   gopstop:
     regex: ".*(gop|гоп).*"
-    stickers:
-      - "CAADAgADXwMAAgw7AAEKTh8jAAH9Q-gAAQI"
 
-`
-    fileBytes := []byte(testFileString)
-    err := ioutil.WriteFile(configPath, fileBytes, 0644)
-    if err != nil {
-        err = fmt.Errorf("Cannot create config <%s>:\t%v", configPath, err)
-    }
-    return err
+    `
+	fileBytes := []byte(testFileString)
+	err := ioutil.WriteFile(configPath, fileBytes, 0644)
+	if err != nil {
+		err = fmt.Errorf("Cannot create config <%s>:\t%v", configPath, err)
+	}
+	return err
 }
 
 // TestGetConfig tests config loading
 func TestGetConfig(t *testing.T) {
-    // Create and load config
-    testConfigPath := "../.test.yml"
-    err := createTestConfig(testConfigPath)
-    if err != nil {
-        t.Fatal(err)
-    }
-    config, err := GetConfig(testConfigPath)
-    if err != nil {
-        t.Fatal(err)
-    }
+	// Create and load config
+	testConfigPath := "../.test.yml"
+	err := createTestConfig(testConfigPath)
+	assert.Nil(t, err)
 
-    // Test token from makefile
-    myToken := "myLittleTestToken"
-    if config.TgToken != myToken{
-        t.Fatal("TgToken mismatch")
-    }
+	config, err := GetConfig(testConfigPath)
+	assert.Nil(t, err)
 
-    // Test words count
-    wordsCount := 2
-    if len(config.Catches) != wordsCount {
-        t.Fatal("Words in wordCathes mismatch")
-    }
+	// Test token from makefile
+	myToken := "myLittleTestToken"
+	assert.Equal(t, myToken, config.TgToken)
 
-    // Test regex compile on "normal" cathch
-    hitStr := "Да это же норма, епт"
-    missStr := "Нет, это уже пиздец"
-    hitMatch := config.Catches["normal"].Regex.MatchString(hitStr)
-    missMatch := config.Catches["normal"].Regex.MatchString(missStr)
-    if !(hitMatch && !missMatch) {
-        t.Fatal("Cannot match \"normal\" regex to strings")
-    }
+	// Test words count
+	assert.Equal(t, 2, len(config.RegexActions))
+
+	// Test regex compile on "normal" cathch
+	assert.Contains(t, config.RegexActions, "normal")
+	assert.Contains(t, config.RegexActions, "gopstop")
+	hitStr := "Да это же норма, епт"
+	missStr := "Нет, это уже пиздец"
+	assert.True(t, config.RegexActions["normal"].Regex.MatchString(hitStr))
+	assert.False(t, config.RegexActions["normal"].Regex.MatchString(missStr))
 }

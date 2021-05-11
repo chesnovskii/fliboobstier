@@ -5,6 +5,7 @@ import (
 	"github.com/chesnovsky/fliboobstier/bot"
 	"github.com/chesnovsky/fliboobstier/config"
 	"github.com/chesnovsky/fliboobstier/logger"
+	"github.com/chesnovsky/fliboobstier/storage"
 )
 
 func main() {
@@ -12,7 +13,13 @@ func main() {
 	configPath := "config.yml"
 	mainConfig, err := config.GetConfig(configPath)
 	if err != nil {
-		logger.Logger.Fatalf("Config load failed:\n%v\n", err)
+		logger.Logger.Fatalf("Config load failed: %+v\n", err)
 	}
-	bot.RunBot(mainConfig)
+	Storage, err := storage.NewSqLite("fliboobstier.db")
+	if err != nil {
+		logger.Logger.Fatalf("Database init failed: %+v\n", err)
+	}
+
+	Bot, _ := bot.InitBot(&mainConfig, &Storage)
+	Bot.RunBot()
 }
