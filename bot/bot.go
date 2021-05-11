@@ -4,7 +4,7 @@ import (
 	"github.com/chesnovsky/fliboobstier/config"
 	"github.com/chesnovsky/fliboobstier/logger"
 	"github.com/chesnovsky/fliboobstier/storage"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
+	tgbotapi "gopkg.in/telegram-bot-api.v5"
 )
 
 type Bot struct {
@@ -56,4 +56,11 @@ func (BotInstance *Bot) RunBot() {
 			}
 		}
 	}
+}
+
+func (BotInstance *Bot) CritError(chatId int64, err error) {
+	logger.Logger.Error(err)
+	msg := tgbotapi.NewMessage(chatId, "Я обосрался")
+	logger.Logger.Debugf("Sending message: %+v\n", msg)
+	BotInstance.TgBot.Send(msg)
 }

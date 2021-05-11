@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/chesnovsky/fliboobstier/logger"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
+	tgbotapi "gopkg.in/telegram-bot-api.v5"
 )
 
 func getElementTypeAndId(message *tgbotapi.Message) (string, string) {
@@ -16,12 +16,12 @@ func getElementTypeAndId(message *tgbotapi.Message) (string, string) {
 		return "image", (*message.Photo)[len(*message.Photo)-1].FileID
 	}
 	if message.Sticker != nil {
-		return "sticker", message.Sticker.FileID
+		return "sticker", message.Sticker.FileUniqueID
 	}
 	return "", ""
 }
 
-func (BotInstance *Bot) listRegexActions(message *tgbotapi.Message) {
+func (BotInstance *Bot) listRegexActions(message *tgbotapi.Message) error {
 	action_strings := []string{}
 	for action_name, action_data := range BotInstance.Config.RegexActions {
 		action_string := fmt.Sprintf("*%s*: `%s`", action_name, action_data.RawRegex)
@@ -31,15 +31,16 @@ func (BotInstance *Bot) listRegexActions(message *tgbotapi.Message) {
 	msg.ParseMode = "Markdown"
 	logger.Logger.Debugf("Sending message: %+v\n", msg)
 	BotInstance.TgBot.Send(msg)
+	return nil
 }
 
-func (BotInstance *Bot) addRegexActionElement(message *tgbotapi.Message) {
+func (BotInstance *Bot) addRegexActionElement(message *tgbotapi.Message) error {
 	if !BotInstance.checkCommandArgs(message, 1) {
-		return
+		return nil
 	}
 	regex_action_name := strings.Split(message.CommandArguments(), " ")[0]
 	if !BotInstance.checkRegexActionExists(regex_action_name, message.Chat.ID) {
-		return
+		return nil
 	}
 	msg_text := "Ok, send me an Image/Sticker/Gif"
 	msg := tgbotapi.NewMessage(message.Chat.ID, msg_text)
@@ -54,6 +55,7 @@ func (BotInstance *Bot) addRegexActionElement(message *tgbotapi.Message) {
 		Data:   transition_data,
 	}
 	BotInstance.addTransition(transition)
+	return nil
 }
 
 func (BotInstance *Bot) continueAddRegexActionElement(message *tgbotapi.Message, transition Transition) {
@@ -65,17 +67,20 @@ func (BotInstance *Bot) continueAddRegexActionElement(message *tgbotapi.Message,
 		BotInstance.removeTransition(transition)
 	}
 	action_id := transition.Data["regex_action_name"]
-	BotInstance.Storage.AddRegexActionElement(action_id, element_type, element_id)
+	err := BotInstance.Storage.AddRegexActionElement(action_id, element_type, element_id)
+	if err != nil {
+		BotInstance.CritError(message.Chat.ID, err)
+	}
 	BotInstance.removeTransition(transition)
 }
 
-func (BotInstance *Bot) removeRegexActionElement(message *tgbotapi.Message) {
+func (BotInstance *Bot) removeRegexActionElement(message *tgbotapi.Message) error {
 	if !BotInstance.checkCommandArgs(message, 1) {
-		return
+		return nil
 	}
 	regex_action_name := strings.Split(message.CommandArguments(), " ")[0]
 	if !BotInstance.checkRegexActionExists(regex_action_name, message.Chat.ID) {
-		return
+		return nil
 	}
 	msg_text := "Ok, send me an Image/Sticker/Gif"
 	msg := tgbotapi.NewMessage(message.Chat.ID, msg_text)
@@ -90,6 +95,7 @@ func (BotInstance *Bot) removeRegexActionElement(message *tgbotapi.Message) {
 		Data:   transition_data,
 	}
 	BotInstance.addTransition(transition)
+	return nil
 }
 
 func (BotInstance *Bot) continueRemoveRegexActionElement(message *tgbotapi.Message, transition Transition) {
@@ -101,7 +107,10 @@ func (BotInstance *Bot) continueRemoveRegexActionElement(message *tgbotapi.Messa
 		BotInstance.removeTransition(transition)
 	}
 	action_id := transition.Data["regex_action_name"]
-	BotInstance.Storage.RemoveRegexActionElement(action_id, element_type, element_id)
+	err := BotInstance.Storage.RemoveRegexActionElement(action_id, element_type, element_id)
+	if err != nil {
+		BotInstance.CritError(message.Chat.ID, err)
+	}
 	BotInstance.removeTransition(transition)
 }
 
@@ -117,16 +126,16 @@ func (BotInstance *Bot) checkRegexActionExists(action string, chatID int64) bool
 	return false
 }
 
-func (BotInstance *Bot) showRegexAction(message *tgbotapi.Message) {
+func (BotInstance *Bot) showRegexAction(message *tgbotapi.Message) error {
 	if !BotInstance.checkCommandArgs(message, 1) {
-		return
+		return nil
 	}
 	regex_action_name := strings.Split(message.CommandArguments(), " ")[0]
 	if !BotInstance.checkRegexActionExists(regex_action_name, message.Chat.ID) {
-		return
+		return nil
 	}
 	// Sending all the medias for action
-	elements, _ := BotInstance.Storage.GetRegexActionElements(regex_action_name)
+	elements, err := BotInstance.Storage.GetRegexActionElements(regex_action_name)
 	for _, media := range elements.Images {
 		msg := tgbotapi.NewPhotoShare(message.Chat.ID, media)
 		BotInstance.TgBot.Send(msg)
@@ -139,4 +148,5 @@ func (BotInstance *Bot) showRegexAction(message *tgbotapi.Message) {
 		msg := tgbotapi.NewStickerShare(message.Chat.ID, media)
 		BotInstance.TgBot.Send(msg)
 	}
+	return err
 }

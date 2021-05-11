@@ -26,10 +26,9 @@ CREATE TABLE regex_action_stickers (
 CREATE UNIQUE INDEX regex_action_stickers_idx
 ON regex_action_stickers(action_id, element_id);
 
-INSERT INTO regex_action_images VALUES ("gopstop", "AgADAgADnqoxG22cUEn8gzuDaxEbmwvotw4ABP9cj0qxecfJtEsFAAEC");
-INSERT INTO regex_action_gifs VALUES ("gopstop", "CgADBAADDaAAAvwYZAcsF65UbbXDbgI");
-INSERT INTO regex_action_stickers VALUES ("gopstop", "CAADAgADXwMAAgw7AAEKTh8jAAH9Q-gAAQI");
-INSERT INTO regex_action_stickers VALUES ("normal", "CAADAgADnQUAAlOx9wMjvcls38LyPwI");
+
+-- INSERT INTO regex_action_images VALUES ("gopstop", "CAACAgIAAx0CSuWRGQACAsBgmj_GWtHeO6Q6WNchT_GYH30HLwACXwMAAgw7AAEKTh8jAAH9Q-gAAR8E");
+-- INSERT INTO regex_action_stickers VALUES ("normal", "CAACAgIAAx0CSuWRGQACArxgmj9zX4uCZwm2HMv66mI3ZZiwYgACnQUAAlOx9wMjvcls38LyPx8E");
 
 
 CREATE TABLE admins (

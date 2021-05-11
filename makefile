@@ -30,7 +30,7 @@ deps:
 	$(GOGET) "github.com/sirupsen/logrus"
 	$(GOGET) "github.com/caarlos0/env"
 	$(GOGET) "gopkg.in/yaml.v2"
-	$(GOGET) "gopkg.in/telegram-bot-api.v4"
+	$(GOGET) "gopkg.in/telegram-bot-api.v5"
 	$(GOGET) "github.com/mattn/go-sqlite3"
 	$(GOGET) "github.com/stretchr/testify"
 	$(GOGET) "github.com/google/uuid"

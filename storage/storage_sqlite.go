@@ -2,10 +2,9 @@ package storage
 
 import (
 	"database/sql"
-	"errors"
 	"fmt"
-	"strings"
 
+	"github.com/chesnovsky/fliboobstier/bot_helpers"
 	"github.com/chesnovsky/fliboobstier/logger"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -30,7 +29,7 @@ func (storage StorageInstance) GetRegexActionElementsSqLite(action_id string, el
 		err_msg := fmt.Sprintf("Cannot select content <%s> for action <%s> from database, query <%s>: %+v", element_type, action_id, query_str, err)
 		logger.Logger.Error(err_msg)
 		err_list = append(err_list, err_msg)
-		return Elements, errors.New(strings.Join(err_list, "\n"))
+		return Elements, bot_helpers.ErrListToError(err_list)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -49,23 +48,43 @@ func (storage StorageInstance) GetRegexActionElementsSqLite(action_id string, el
 		logger.Logger.Error(err_msg)
 		err_list = append(err_list, err_msg)
 	}
-	return Elements, errors.New(strings.Join(err_list, "\n"))
+	return Elements, bot_helpers.ErrListToError(err_list)
 }
 
 // Database-dependent function
 // Write a new one if you are moving to another database
 func (storage StorageInstance) AddRegexActionElementSqlite(action_id string, element_type string, element_id string) error {
 	query_str := fmt.Sprintf("insert into regex_action_%ss(action_id, element_id) values (?, ?)", element_type)
-	_, err := storage.db.Exec(query_str, action_id, element_id)
-	return err
+	result, err := storage.db.Exec(query_str, action_id, element_id)
+	if err != nil {
+		return err
+	}
+	rows_affected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Error while reading affected_rows for query <%s>, params <%s>, <%s>: %+v", query_str, action_id, element_id, err)
+	}
+	if rows_affected != 1 {
+		return fmt.Errorf("Query <%s> hasn't changed anything, params: <%s>, <%s>", query_str, action_id, element_id)
+	}
+	return nil
 }
 
 // Database-dependent function
 // Write a new one if you are moving to another database
 func (storage StorageInstance) RemoveRegexActionElementSqlite(action_id string, element_type string, element_id string) error {
 	query_str := fmt.Sprintf("delete from regex_action_%ss where action_id=? and element_id=?", element_type)
-	_, err := storage.db.Exec(query_str, action_id, element_id)
-	return err
+	result, err := storage.db.Exec(query_str, action_id, element_id)
+	if err != nil {
+		return err
+	}
+	rows_affected, err := result.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Error while reading affected_rows for query <%s>, params <%s>, <%s>: %+v", query_str, action_id, element_id, err)
+	}
+	if rows_affected != 1 {
+		return fmt.Errorf("Query <%s> hasn't changed anything, params: <%s>, <%s>", query_str, action_id, element_id)
+	}
+	return nil
 }
 
 // Database-dependent function
@@ -79,7 +98,7 @@ func (storage StorageInstance) GetAdminListSqlite() ([]string, error) {
 		err_msg := fmt.Sprintf("Cannot select admin list from database, query <%s>: %+v", query_str, err)
 		logger.Logger.Error(err_msg)
 		err_list = append(err_list, err_msg)
-		return AdminList, errors.New(strings.Join(err_list, "\n"))
+		return AdminList, bot_helpers.ErrListToError(err_list)
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -98,5 +117,5 @@ func (storage StorageInstance) GetAdminListSqlite() ([]string, error) {
 		logger.Logger.Error(err_msg)
 		err_list = append(err_list, err_msg)
 	}
-	return AdminList, errors.New(strings.Join(err_list, "\n"))
+	return AdminList, bot_helpers.ErrListToError(err_list)
 }

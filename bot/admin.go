@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/chesnovsky/fliboobstier/logger"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
+	tgbotapi "gopkg.in/telegram-bot-api.v5"
 )
 
 func contains(arr []string, str string) bool {
@@ -38,17 +38,22 @@ func (BotInstance *Bot) processAdminCommands(message *tgbotapi.Message) {
 	// show_regex_action			- Show all media for regex action
 	// add_regex_action_element 	- Add new media to regex action
 	// remove_regex_action_element	- Remove media from regex action
+	logger.Logger.Debugf("Processing admin command <%s>", message.Text)
+	var err error
 	switch message.Command() {
 	case "list_admins":
-		BotInstance.listAdmins(message)
+		err = BotInstance.listAdmins(message)
 	case "list_regex_actions":
-		BotInstance.listRegexActions(message)
+		err = BotInstance.listRegexActions(message)
 	case "show_regex_action":
-		BotInstance.showRegexAction(message)
+		err = BotInstance.showRegexAction(message)
 	case "add_regex_action_element":
-		BotInstance.addRegexActionElement(message)
+		err = BotInstance.addRegexActionElement(message)
 	case "remove_regex_action_element":
-		BotInstance.removeRegexActionElement(message)
+		err = BotInstance.removeRegexActionElement(message)
+	}
+	if err != nil {
+		BotInstance.CritError(message.Chat.ID, err)
 	}
 }
 

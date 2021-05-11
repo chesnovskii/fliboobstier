@@ -4,7 +4,7 @@ import (
 	"reflect"
 
 	"github.com/chesnovsky/fliboobstier/logger"
-	tgbotapi "gopkg.in/telegram-bot-api.v4"
+	tgbotapi "gopkg.in/telegram-bot-api.v5"
 )
 
 func (BotInstance *Bot) addTransition(src_transition Transition) {
